@@ -1,0 +1,19 @@
+on: [ pull_request ]
+
+jobs:
+  automerge:
+    if: github.event.pull_request.user.login == "marten-seemann"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Wait on tests
+      uses: lewagon/wait-on-check-action@master
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        wait-interval: 10
+        running-workflow-name: 'automerge' # the name of this job
+    - name: Merge PR
+      uses: pascalgn/automerge-action@v0.13.1
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
