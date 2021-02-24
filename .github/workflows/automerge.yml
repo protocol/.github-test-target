@@ -1,8 +1,11 @@
+# Workflow managed by ipldbot. DO NOT EDIT.
+# See https://github.com/ipld/.github/ for details.
+
 on: [ pull_request ]
 
 jobs:
   automerge:
-    if: github.event.pull_request.user.login == 'marten-seemann'
+    if: github.event.pull_request.user.login == 'ipldbot'
     runs-on: ubuntu-latest
     steps:
     - name: Wait on tests
