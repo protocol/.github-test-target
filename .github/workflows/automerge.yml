@@ -3,13 +3,15 @@
 
 on: [ pull_request ]
 
+# Auto-merge pull requests opened by ipldbot, if all tests pass.
+# This reduces the friction associated with updating with our workflows.
 jobs:
   automerge:
     if: github.event.pull_request.user.login == 'ipldbot'
     runs-on: ubuntu-latest
     steps:
     - name: Wait on tests
-      uses: lewagon/wait-on-check-action@master
+      uses: lewagon/wait-on-check-action@v0.2
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         repo-token: ${{ secrets.GITHUB_TOKEN }}
