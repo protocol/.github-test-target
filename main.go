@@ -6,3 +6,7 @@ func main() {
 	fmt.Println("hello")
 	fmt.Println("bye")
 }
+
+func mult(a, b int) int {
+	return a * b
+}
