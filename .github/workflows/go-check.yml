@@ -9,8 +9,7 @@ jobs:
     name: Go checks
     steps:
       - uses: actions/checkout@v2
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
+      - uses: WillAbides/setup-go-faster@34c5f5ac9e57768758df0a2ef40b598b3572b11b
         with:
-          version: v1.33
-          args: "--disable-all --enable gofmt,govet"
+          go-version: "1.16.x"
+      - run: go vet ./...
