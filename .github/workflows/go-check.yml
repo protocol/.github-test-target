@@ -9,10 +9,8 @@ jobs:
     name: Go checks
     steps:
       - uses: actions/checkout@v2
-      - uses: WillAbides/setup-go-faster@34c5f5ac9e57768758df0a2ef40b598b3572b11b # v1.5.0
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
         with:
-          go-version: "1.16.x"
-      - name: Install staticcheck
-        run: go install honnef.co/go/tools/cmd/staticcheck@be534f007836a777104a15f2456cd1fffd3ddee8 # v2020.2.2
-      - run: go vet ./...
-      - run: staticcheck ./...
+          version: v1.33
+          args: "--disable-all --enable gofmt,govet"
