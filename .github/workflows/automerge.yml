@@ -1,4 +1,4 @@
-# Workflow managed by ipldbot. DO NOT EDIT.
+# File managed by ipldbot. DO NOT EDIT.
 # See https://github.com/ipld/.github/ for details.
 
 on: [ pull_request ]
