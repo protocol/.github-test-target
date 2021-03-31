@@ -15,5 +15,5 @@ func TestRandomSleep(t *testing.T) {
 }
 
 func TestMult(t *testing.T) {
-	mult(3, 4)
+	_ = mult(3, 4)
 }
