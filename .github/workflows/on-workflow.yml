@@ -1,0 +1,13 @@
+on:
+  workflow_run:
+    workflows: ["go-check", "Go checks", "go-check.yml"]
+    branches: [master]
+    types:
+      - completed
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    name: workflow_run
+    steps:
+      - run: echo "workflow go-check ran"
