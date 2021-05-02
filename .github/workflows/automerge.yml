@@ -6,15 +6,17 @@ on: [ pull_request ]
 # Auto-merge pull requests opened by ipldbot, if all tests pass.
 # This reduces the friction associated with updating with our workflows.
 jobs:
-  automerge:
+  automerge-check:
     if: github.event.pull_request.user.login == 'ipldbot'
     runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.should-automerge.outputs.status }}
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
     - name: Check if we should automerge
-      id: should_automerge
+      id: should-automerge
       env:
         GITHUB_EMAIL: "ipldbot@users.noreply.github.com"
       run: |
@@ -28,9 +30,12 @@ jobs:
           fi
         done
         echo "::set-output name=status::true"
-    - run: echo ${{ steps.should_automerge.outputs.status }}
+  automerge:
+    needs: automerge-check
+    runs-on: ubuntu-latest
+    if: ${{ needs.automerge-check.outputs.status == 'true' }}
+    steps:
     - name: Wait on tests
-      if: steps.should_automerge.outputs.status
       uses: lewagon/wait-on-check-action@bafe56a6863672c681c3cf671f5e10b20abf2eaa # v0.2
       with:
         ref: ${{ github.event.pull_request.head.sha }}
@@ -38,7 +43,6 @@ jobs:
         wait-interval: 10
         running-workflow-name: 'automerge' # the name of this job
     - name: Merge PR
-      if: steps.should_automerge.outputs.status
       uses: pascalgn/automerge-action@741c311a47881be9625932b0a0de1b0937aab1ae # v0.13.1
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
