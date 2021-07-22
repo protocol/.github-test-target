@@ -40,6 +40,7 @@ jobs:
         with:
           run: go test -v -race ./...
       - name: Collect coverage files
+        shell: bash
         run: |
           files=`find . -type f -name 'module-coverage.txt' | tr -s '\n' ',' | sed 's/.$//'`
           echo $files
