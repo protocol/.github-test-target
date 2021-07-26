@@ -1,3 +1,6 @@
+# File managed by web3-bot. DO NOT EDIT.
+# See https://github.com/protocol/.github/ for details.
+
 on: [push, pull_request]
 name: Go Test
 
@@ -8,8 +11,6 @@ jobs:
       matrix:
         os: [ "ubuntu", "windows", "macos" ]
         go: [ "1.15.x", "1.16.x" ]
-    env:
-      COVERAGES: ""
     runs-on: ${{ matrix.os }}-latest
     name: ${{ matrix.os}} (go ${{ matrix.go }})
     steps:
@@ -26,7 +27,7 @@ jobs:
       - name: Run tests
         uses: protocol/multiple-go-modules@v1.0
         with:
-          run: go test -v -coverprofile module-coverage.txt ./...
+          run: go test -v -coverprofile coverage.txt ./...
       - name: Run tests (32 bit)
         if: ${{ matrix.os != 'macos' }} # can't run 32 bit tests on OSX.
         uses: protocol/multiple-go-modules@v1.0
@@ -39,13 +40,8 @@ jobs:
         uses: protocol/multiple-go-modules@v1.0
         with:
           run: go test -v -race ./...
-      - name: Collect coverage files
-        shell: bash
-        run: echo "COVERAGES=`find . -type f -name 'module-coverage.txt' | tr -s '\n' ',' | sed 's/.$//'`" >> $GITHUB_ENV
-      - name: coverages
-        run: echo ${{ env.COVERAGES }}
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@c585afe366f940d214dc09df2664c06d7fe07052 # v2.0.1
+        uses: codecov/codecov-action@a1ed4b322b4b38cb846afb5a0ebfa17086917d27 # v1.5.0
         with:
-          files: ${{ env.COVERAGES }}
+          file: coverage.txt
           env_vars: OS=${{ matrix.os }}, GO=${{ matrix.go }}
