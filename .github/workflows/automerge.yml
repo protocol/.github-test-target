@@ -1,13 +1,15 @@
-# File managed by ipldbot. DO NOT EDIT.
-# See https://github.com/ipld/.github/ for details.
+# File managed by web3-bot. DO NOT EDIT.
+# See https://github.com/protocol/.github/ for details.
+
+# Automatically merge pull requests opened by web3-bot, as soon as (and only if) all tests pass.
+# This reduces the friction associated with updating with our workflows.
 
 on: [ pull_request ]
+name: Automerge
 
-# Auto-merge pull requests opened by ipldbot, if all tests pass.
-# This reduces the friction associated with updating with our workflows.
 jobs:
   automerge-check:
-    if: github.event.pull_request.user.login == 'ipldbot'
+    if: github.event.pull_request.user.login == 'web3-bot'
     runs-on: ubuntu-latest
     outputs:
       status: ${{ steps.should-automerge.outputs.status }}
@@ -17,13 +19,11 @@ jobs:
         fetch-depth: 0
     - name: Check if we should automerge
       id: should-automerge
-      env:
-        GITHUB_EMAIL: "ipldbot@users.noreply.github.com"
       run: |
         for commit in $(git rev-list --first-parent origin/${{ github.event.pull_request.base.ref }}..${{ github.event.pull_request.head.sha }}); do
           committer=$(git show --format=$'%ce' -s $commit)
           echo "Committer: $committer"
-          if [[ "$committer" != "${{ env.GITHUB_EMAIL }}" ]]; then
+          if [[ "$committer" != "web3-bot@users.noreply.github.com" ]]; then
             echo "Commit $commit wasn't committed by web3-bot, but by $committer."
             echo "::set-output name=status::false"
             exit
@@ -47,5 +47,5 @@ jobs:
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         MERGE_LABELS: ""
-        MERGE_DELETE_BRANCH: true
         MERGE_METHOD: "squash"
+        MERGE_DELETE_BRANCH: true

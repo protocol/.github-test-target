@@ -1,5 +1,5 @@
-# File managed by ipldbot. DO NOT EDIT.
-# See https://github.com/ipld/.github/ for details.
+# File managed by web3-bot. DO NOT EDIT.
+# See https://github.com/protocol/.github/ for details.
 
 on: [push, pull_request]
 name: Go Checks
