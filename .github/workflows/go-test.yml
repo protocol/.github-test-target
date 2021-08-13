@@ -1,13 +1,7 @@
 # File managed by web3-bot. DO NOT EDIT.
 # See https://github.com/protocol/.github/ for details.
 
-on: 
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+on: [push, pull_request]
 name: Go Test
 
 jobs:
@@ -33,6 +27,9 @@ jobs:
         run: |
           go version
           go env
+      - name: Run repo-specific setup
+        uses: ./.github/actions/go-test_setup.yml
+        if: hashFiles('./.github/actions/go-test_setup.yml') != ''
       - name: Run tests
         uses: protocol/multiple-go-modules@v1.2
         with:
