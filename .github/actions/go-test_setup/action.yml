@@ -4,9 +4,7 @@ runs:
     - name: Step 1 of setup
       run: echo "step 1"
       shell: bash
-    - name: Step 2 of setup
-      run: echo "step 2"
+    - run: echo ${{ matrix.os }}
       shell: bash
-    - name: Step 3 of setup
-      run: echo "step 3"
+    - run: echo ${{ matrix.go }}
       shell: bash
