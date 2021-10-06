@@ -33,6 +33,8 @@ jobs:
   automerge:
     needs: automerge-check
     runs-on: ubuntu-latest
+    # The check for the user is redundant here, as this job depends on the automerge-check job,
+    # but it prevents this job from spinning up, just to be skipped shortly after.
     if: github.event.pull_request.user.login == 'web3-bot' && needs.automerge-check.outputs.status == 'true'
     steps:
     - name: Wait on tests
