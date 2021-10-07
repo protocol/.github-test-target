@@ -8,4 +8,4 @@ jobs:
   releaser:
     uses: protocol/.github/.github/workflows/tagpush.yml@releaser
     with:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+      token: ${{ secrets.GITHUB_TOKEN }}
