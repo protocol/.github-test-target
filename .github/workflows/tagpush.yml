@@ -1,0 +1,9 @@
+name: Tag Push Cheker
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  releaser:
+    uses: protocol/.github/.github/workflows/tagpush.yml@releaser
