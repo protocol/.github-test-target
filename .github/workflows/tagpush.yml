@@ -7,5 +7,3 @@ on:
 jobs:
   releaser:
     uses: protocol/.github/.github/workflows/tagpush.yml@releaser
-    secrets:
-      ghtoken: ${{ secrets.GITHUB_TOKEN }}
