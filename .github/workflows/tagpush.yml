@@ -8,7 +8,4 @@ jobs:
   releaser:
     uses: protocol/.github/.github/workflows/tagpush.yml@releaser
     with:
-      username: "us3r n4m3"
-    secrets:
-      faketoken: "fake token 123"
       token: ${{ secrets.GITHUB_TOKEN }}
