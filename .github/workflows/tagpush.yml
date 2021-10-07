@@ -1,4 +1,4 @@
-name: Tag Push Cheker
+name: Tag Push Checker
 on:
   push:
     tags:
