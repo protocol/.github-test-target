@@ -8,6 +8,7 @@ jobs:
       matrix:
         shell: [ "bash" ]
         os: 
+          - { name: "ubuntu", shell: "bash" }
           - { name: "windows", shell: "msys2 {0}" }
         go: [ "1.16.x", "1.17.x" ]
     env:
@@ -16,7 +17,7 @@ jobs:
     name: ${{ matrix.os.name }} (go ${{ matrix.go }}, shell ${{ matrix.os.shell }})
     defaults:
       run:
-        shell: "msys2 {0}"
+        shell: ${{ matrix.os.shell }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -25,16 +26,7 @@ jobs:
         if: ${{ matrix.os.name == 'windows' }}
         with:
           path-type: inherit
-      - name: output shell
-        shell: bash
-        run: |
-          echo $SHELL
-          ps -p $$
-      - name: output shell (msys2)
-        shell: "msys2 {0}"
-        run: |
-          echo $SHELL
-          ps -p $$
+      - run: echo $0
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go }}
@@ -45,22 +37,29 @@ jobs:
       - name: Run repo-specific setup
         uses: ./.github/actions/go-test-setup
         if: hashFiles('./.github/actions/go-test-setup') != ''
-      - run: echo ${{ defaults.run.shell }}
-      - name: Run tests
-        uses: protocol/multiple-go-modules@v1.2
+      - name: echo shell
+        uses: protocol/multiple-go-modules@configure-shell
         with:
+          shell: ${{ matrix.os.shell }}
+          run: echo $0
+      - name: Run tests
+        uses: protocol/multiple-go-modules@configure-shell
+        with:
+          shell: ${{ matrix.os.shell }}
           run: go test -v -coverprofile module-coverage.txt ./...
       - name: Run tests (32 bit)
         if: ${{ matrix.os.name != 'macos' }} # can't run 32 bit tests on OSX.
-        uses: protocol/multiple-go-modules@v1.2
+        uses: protocol/multiple-go-modules@configure-shell
         env:
           GOARCH: 386
         with:
+          shell: ${{ matrix.os.shell }}
           run: go test -v ./...
       - name: Run tests with race detector
         if: ${{ matrix.os.name == 'ubuntu' }} # speed things up. Windows and OSX VMs are slow
-        uses: protocol/multiple-go-modules@v1.2
+        uses: protocol/multiple-go-modules@configure-shell
         with:
+          shell: ${{ matrix.os.shell }}
           run: go test -v -race ./...
       - name: Collect coverage files
         shell: bash
