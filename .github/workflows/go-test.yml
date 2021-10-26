@@ -27,6 +27,10 @@ jobs:
         if: ${{ matrix.os.name == 'windows' }}
         with:
           path-type: inherit
+      - name: output shell
+        run: |
+          echo $SHELL
+          ps -p $$
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go }}
