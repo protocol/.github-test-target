@@ -7,15 +7,15 @@ jobs:
       fail-fast: false
       matrix:
         shell: [ "bash" ]
-        os: [ "ubuntu", "windows", "macos" ]
+        os: 
+          - { name: "ubuntu", shell: "bash" }
+          - { name: "windows", shell: "msys2" }
+          - { name: "macos", shell: "bash" }
         go: [ "1.16.x", "1.17.x" ]
-        include:
-        - os: windows
-          shell: msys2
     env:
       COVERAGES: ""
-    runs-on: ${{ matrix.os }}-latest
-    name: ${{ matrix.os}} (go ${{ matrix.go }}, shell ${{ matrix.shell }})
+    runs-on: ${{ matrix.os.name }}-latest
+    name: ${{ matrix.os.name }} (go ${{ matrix.go }}, shell ${{ matrix.os.shell }})
     steps:
       - uses: actions/checkout@v2
         with:
@@ -35,14 +35,14 @@ jobs:
         with:
           run: go test -v -coverprofile module-coverage.txt ./...
       - name: Run tests (32 bit)
-        if: ${{ matrix.os != 'macos' }} # can't run 32 bit tests on OSX.
+        if: ${{ matrix.os.name != 'macos' }} # can't run 32 bit tests on OSX.
         uses: protocol/multiple-go-modules@v1.2
         env:
           GOARCH: 386
         with:
           run: go test -v ./...
       - name: Run tests with race detector
-        if: ${{ matrix.os == 'ubuntu' }} # speed things up. Windows and OSX VMs are slow
+        if: ${{ matrix.os.name == 'ubuntu' }} # speed things up. Windows and OSX VMs are slow
         uses: protocol/multiple-go-modules@v1.2
         with:
           run: go test -v -race ./...
@@ -53,4 +53,4 @@ jobs:
         uses: codecov/codecov-action@51d810878be5422784e86451c0e7c14e5860ec47 # v2.0.2
         with:
           files: '${{ env.COVERAGES }}'
-          env_vars: OS=${{ matrix.os }}, GO=${{ matrix.go }}
+          env_vars: OS=${{ matrix.os.name }}, GO=${{ matrix.go }}
