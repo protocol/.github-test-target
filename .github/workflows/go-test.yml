@@ -26,6 +26,12 @@ jobs:
         with:
           path-type: inherit
       - name: output shell
+        shell: bash
+        run: |
+          echo $SHELL
+          ps -p $$
+      - name: output shell (msys2)
+        shell: "msys2 {0}"
         run: |
           echo $SHELL
           ps -p $$
