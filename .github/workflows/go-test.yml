@@ -9,13 +9,16 @@ jobs:
         shell: [ "bash" ]
         os: 
           - { name: "ubuntu", shell: "bash" }
-          - { name: "windows", shell: "msys2" }
+          - { name: "windows", shell: "msys2 {0}" }
           - { name: "macos", shell: "bash" }
         go: [ "1.16.x", "1.17.x" ]
     env:
       COVERAGES: ""
     runs-on: ${{ matrix.os.name }}-latest
     name: ${{ matrix.os.name }} (go ${{ matrix.go }}, shell ${{ matrix.os.shell }})
+    defaults:
+      run:
+        shell: ${{ matrix.os.shell }}
     steps:
       - uses: actions/checkout@v2
         with:
