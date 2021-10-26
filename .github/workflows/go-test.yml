@@ -45,6 +45,7 @@ jobs:
       - name: Run repo-specific setup
         uses: ./.github/actions/go-test-setup
         if: hashFiles('./.github/actions/go-test-setup') != ''
+      - run: echo ${{ defaults.run.shell }}
       - name: Run tests
         uses: protocol/multiple-go-modules@v1.2
         with:
