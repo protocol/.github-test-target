@@ -5,8 +5,7 @@ name: Release Checker
 on:
   pull_request:
     paths: [ 'version.json' ]
-    branches: [ master ]
 
 jobs:
   release-check:
-    uses: protocol/.github/.github/workflows/release-check.yml@testing
+    uses: protocol/.github/.github/workflows/release-check.yml@off-master-release
