@@ -9,4 +9,4 @@ on:
 
 jobs:
   release-check:
-    uses: protocol/.github/.github/workflows/release-check.yml@testing
+    uses: protocol/.github/.github/workflows/release-check.yml@master
