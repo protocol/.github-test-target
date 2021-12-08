@@ -5,7 +5,8 @@ name: Releaser
 on:
   push:
     paths: [ 'version.json' ]
+    branches: [ master ]
 
 jobs:
   releaser:
-    uses: protocol/.github/.github/workflows/releaser.yml@off-master-release
+    uses: protocol/.github/.github/workflows/releaser.yml@master
