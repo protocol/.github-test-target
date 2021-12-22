@@ -1,0 +1,13 @@
+# File managed by web3-bot. DO NOT EDIT.
+# See https://github.com/protocol/.github/ for details.
+
+on: [push, pull_request]
+name: Test
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: ${{ config.testing.template.engine }}
+    steps:
+      - run: exit 1
+        shell: bash
