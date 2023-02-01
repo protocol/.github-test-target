@@ -8,6 +8,4 @@ on:
 
 jobs:
   release-check:
-    uses: protocol/.github/.github/workflows/release-check.yml@master
-    with:
-      go-version: 1.19.x
+    uses: protocol/.github/.github/workflows/release-check.yml@pr-target-release-check
