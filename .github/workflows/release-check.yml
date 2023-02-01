@@ -8,4 +8,4 @@ on:
 
 jobs:
   release-check:
-    uses: protocol/.github/.github/workflows/release-check.yml@pr-target-release-check
+    uses: protocol/.github/.github/workflows/release-check.yml@github-release-v2
