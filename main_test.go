@@ -8,7 +8,7 @@ import (
 )
 
 func TestRandomSleep(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
+	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
 	d := time.Duration(10+rand.Intn(20)) * time.Second
 	fmt.Println("Sleeping for", d)
 	time.Sleep(d)
