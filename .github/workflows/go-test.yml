@@ -1,10 +1,7 @@
 # File managed by web3-bot. DO NOT EDIT.
 # See https://github.com/protocol/.github/ for details.
 
-on:
-  pull_request:
-  push:
-    branches: ["master"]
+on: [push, pull_request]
 name: Go Test
 
 jobs:
@@ -44,13 +41,15 @@ jobs:
       - name: Run repo-specific setup
         uses: ./.github/actions/go-test-setup
         if: hashFiles('./.github/actions/go-test-setup') != ''
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@875f29492fe9f4123b8489763be916f80ffff872 # v1.9.0
       - name: Run tests
         if: contains(fromJSON(steps.config.outputs.json).skipOSes, matrix.os) == false
         uses: protocol/multiple-go-modules@v1.2
         env:
           GOFLAGS: ${{ format('{0} {1}', env.GOTESTFLAGS, env.GOFLAGS) }}
         with:
-          run: go test -v ./...
+          run: gotestsum -jsonfile=gotest.json -v ./...
       - name: Run tests (32 bit)
         # can't run 32 bit tests on OSX.
         if: matrix.os != 'macos' &&
@@ -63,7 +62,7 @@ jobs:
         with:
           run: |
             export "PATH=$PATH_386:$PATH"
-            go test -v ./...
+            gotestsum -jsonfile=gotest.386.json -v ./...
       - name: Run tests with race detector
         # speed things up. Windows and OSX VMs are slow
         if: matrix.os == 'ubuntu' &&
@@ -72,7 +71,7 @@ jobs:
         env:
           GOFLAGS: ${{ format('{0} {1}', env.GORACEFLAGS, env.GOFLAGS) }}
         with:
-          run: go test -v -race ./...
+          run: gotestsum -jsonfile=gotest.race.json -v -race ./...
       - name: Collect coverage files
         id: coverages
         shell: bash
@@ -82,3 +81,56 @@ jobs:
         with:
           files: ${{ steps.coverages.outputs.files }}
           env_vars: OS=${{ matrix.os }}, GO=${{ matrix.go }}
+      - id: json
+        if: success() || failure()
+        run: |
+          eof="EOF$RANDOM"
+          echo "default<<$eof$(find . -name "gotest.json")$eof" >> $GITHUB_OUTPUT
+          echo "386<<$eof$(find . -name "gotest.386.json")$eof" >> $GITHUB_OUTPUT
+          echo "race<<$eof$(find . -name "gotest.race.json"$eof)" >> $GITHUB_OUTPUT
+        shell: bash
+      - if: (success() || failure()) && steps.json.outputs.default != ''
+        uses: pl-strflt/gotest-json-to-junit-xml@v1
+        with:
+          input: ${{ steps.json.outputs.default }}
+          output: gotest.xml
+      - if: (success() || failure()) && steps.json.outputs.386 != ''
+        uses: pl-strflt/gotest-json-to-junit-xml@v1
+        with:
+          input: ${{ steps.json.outputs.386 }}
+          output: gotest.386.xml
+      - if: (success() || failure()) && steps.json.outputs.race != ''
+        uses: pl-strflt/gotest-json-to-junit-xml@v1
+        with:
+          input: ${{ steps.json.outputs.race }}
+          output: gotest.race.xml
+      - if: (success() || failure()) && steps.json.outputs.default != ''
+        uses: pl-strflt/junit-xml-to-html@v1
+        with:
+          mode: summary
+          input: gotest.xml
+          output: gotest.html
+      - if: (success() || failure()) && steps.json.outputs.386 != ''
+        uses: pl-strflt/junit-xml-to-html@v1
+        with:
+          mode: summary
+          input: gotest.386.xml
+          output: gotest.386.html
+      - if: (success() || failure()) && steps.json.outputs.race != ''
+        uses: pl-strflt/junit-xml-to-html@v1
+        with:
+          mode: summary
+          input: gotest.race.xml
+          output: gotest.race.html
+      - if: success() || failure()
+        run: |
+          if [[ -f gotest.html ]]; then
+            echo "## go test ($RUNNER_OS)\n$(cat gotest.html)" >> $GITHUB_SUMMARY_STEP
+          fi
+          if [[ -f gotest.386.html ]]; then
+            echo "## GOARCH=386 go test ($RUNNER_OS)\n$(cat gotest.386.html)" >> $GITHUB_SUMMARY_STEP
+          fi
+          if [[ -f gotest.race.html ]]; then
+            echo "## go test -race ($RUNNER_OS)\n$(cat gotest.race.html)" >> $GITHUB_SUMMARY_STEP
+          fi
+        shell: bash
