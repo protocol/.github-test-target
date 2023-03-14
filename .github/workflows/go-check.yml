@@ -1,10 +1,7 @@
 # File managed by web3-bot. DO NOT EDIT.
 # See https://github.com/protocol/.github/ for details.
 
-on:
-  pull_request:
-  push:
-    branches: ["master"]
+on: [push, pull_request]
 name: Go Checks
 
 jobs:
