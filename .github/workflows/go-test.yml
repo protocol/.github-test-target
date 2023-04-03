@@ -1,11 +1,15 @@
 # File managed by web3-bot. DO NOT EDIT.
 # See https://github.com/protocol/.github/ for details.
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches: ["master"]
 name: Go Test
 
-permissions:
-  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event_name == 'push' && github.sha || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   unit:
@@ -13,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ "ubuntu", "windows", "macos" ]
-        go: ["1.19.x","1.20.x"]
+        go: [ "this", "next" ]
     env:
       GOTESTFLAGS: -shuffle=on -cover -coverprofile=module-coverage.txt -coverpkg=./...
       GO386FLAGS: -shuffle=on
@@ -21,18 +25,6 @@ jobs:
     runs-on: ${{ fromJSON(vars[format('UCI_GO_TEST_RUNNER_{0}', matrix.os)] || format('"{0}-latest"', matrix.os)) }}
     name: ${{ matrix.os }} (go ${{ matrix.go }})
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - id: config
-        uses: protocol/.github/.github/actions/read-config@master
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ${{ matrix.go }}
-      - name: Go information
-        run: |
-          go version
-          go env
       - name: Use msys2 on windows
         if: matrix.os == 'windows'
         shell: bash
@@ -41,6 +33,36 @@ jobs:
         # If we prepend its location to the PATH
         #   subsequent 'shell: bash' steps will use msys2 instead of gitbash
         run: echo "C:/msys64/usr/bin" >> $GITHUB_PATH
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - id: config
+        uses: protocol/.github/.github/actions/read-config@master
+      - id: go-mod
+        # TODO: change ref to next before merging
+        uses: protocol/.github/.github/actions/read-go-mod@no-go
+      - id: go
+        env:
+          MATRIX_GO: ${{ matrix.go }}
+          GO_MOD_VERSION: ${{ fromJSON(steps.go-mod.outputs.json).Go }}
+        run: |
+          if [[ "$MATRIX_GO" == "this" ]]; then
+            echo "version=$GO_MOD_VERSION.x" >> $GITHUB_OUTPUT
+          elif [[ "$MATRIX_GO" == "next" ]]; then
+            MAJOR="${GO_MOD_VERSION%.[0-9]*}"
+            MINOR="${GO_MOD_VERSION#[0-9]*.}"
+            echo "version=$MAJOR.$(($MINOR+1)).x" >> $GITHUB_OUTPUT
+          else
+            echo "version=$MATRIX_GO" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ steps.go.outputs.version }}
+      - name: Go information
+        run: |
+          go version
+          go env
       - name: Run repo-specific setup
         uses: ./.github/actions/go-test-setup
         if: hashFiles('./.github/actions/go-test-setup') != ''
