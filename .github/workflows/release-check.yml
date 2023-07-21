@@ -12,6 +12,6 @@ concurrency:
 
 jobs:
   release-check:
-    uses: protocol/.github/.github/workflows/release-check.yml@bcc9dd7ac58a9478b8b9b338c7ea57aeabda7256
+    uses: protocol/.github/.github/workflows/release-check.yml@make_latest
     with:
       go-version: 1.20.x
