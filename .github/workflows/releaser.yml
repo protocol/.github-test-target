@@ -1,10 +1,10 @@
-# File managed by web3-bot. DO NOT EDIT.
-# See https://github.com/protocol/.github/ for details.
-
 name: Releaser
 on:
   push:
     paths: [ 'version.json' ]
+
+permissions:
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
@@ -12,4 +12,4 @@ concurrency:
 
 jobs:
   releaser:
-    uses: protocol/.github/.github/workflows/releaser.yml@make_latest
+    uses: pl-strflt/uci/.github/workflows/releaser.yml@v0
