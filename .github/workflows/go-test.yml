@@ -1,8 +1,10 @@
+name: Go Test
+
 on:
   pull_request:
   push:
     branches: ["master"]
-name: Go Test
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,4 +15,4 @@ concurrency:
 
 jobs:
   go-test:
-    uses: pl-strflt/uci/.github/workflows/go-test.yml@v0.0
+    uses: pl-strflt/uci/.github/workflows/go-test.yml@unified-ci-2.0
